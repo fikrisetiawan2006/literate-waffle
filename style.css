@@ -17,6 +17,9 @@
   position: fixed;
   bottom: 24px;
   right: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: dodgerblue;
   color: white;
   border: 0;
