@@ -29,27 +29,25 @@ function addTask (taskName) {
 }
 
 function removeTask (taskName) {
-  if (localStorage.getItem('tasks') !== null) {
-    let i = 0
-    let j = 1
-    tasks.forEach(function (task) {
-      i += j
-      if (task.split(' ').join('-').toLowerCase() === taskName) {
-        j = 0
-      }
-    })
-    tasks.splice(i - 1, 1)
-    localStorage.setItem('tasks', JSON.stringify(tasks))
-  }
+  let i = 0
+  let j = 1
+  tasks.forEach(function (task) {
+    i += j
+    if (task.split(' ').join('-').toLowerCase() === taskName) {
+      j = 0
+    }
+  })
+  tasks.splice(i - 1, 1)
+  localStorage.setItem('tasks', JSON.stringify(tasks))
 }
 
-onload = function () {
+addEventListener('load', function () {
   if (tasks.length !== 0) {
     tasks.forEach(function (task) {
       renderTask(task)
     })
   }
-}
+})
 
 const checkboxes = document.querySelectorAll('input.checkbox')
 checkboxes.forEach(function (checkbox) {
