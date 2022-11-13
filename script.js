@@ -1,84 +1,75 @@
 let tasks = []
-if (localStorage.getItem('tasks') !== null) {
-  tasks = tasks.concat(JSON.parse(localStorage.getItem('tasks')))
-}
 
-const ul = document.querySelector('ul')
+const taskContainer = document.getElementById('taskContainer')
+const taskValue = document.getElementById('taskValue')
+const plusButton = document.getElementById('plusButton')
 
-function renderTask (data) {
-  const li = document.createElement('li')
-  li.classList.add(data.split(' ').join('-').toLowerCase())
-  ul.appendChild(li)
-  const checkbox = document.createElement('input')
-  checkbox.type = 'checkbox'
-  checkbox.classList.add('checkbox')
-  li.appendChild(checkbox)
-  const text = document.createElement('span')
-  li.appendChild(text)
-  text.innerHTML = data
-  checkbox.addEventListener('change', function () {
-    ul.removeChild(checkbox.parentNode)
-    removeTask(checkbox.parentNode.classList[0])
-  })
+const lis = document.querySelectorAll('li')
+
+function loadTasks () {
+  if (
+    localStorage.getItem('tasks') !== null
+  ) {
+    tasks = JSON.parse(localStorage.getItem('tasks'))
+  }
 }
 
 function addTask (taskName) {
-  tasks.push(taskName)
+  const task = {
+    id: new Date().getTime(),
+    name: taskName
+  }
+  tasks.push(task)
   localStorage.setItem('tasks', JSON.stringify(tasks))
-  renderTask(taskName)
+  displayTask(task)
 }
 
-function removeTask (taskName) {
-  let i = 0
-  let j = 1
-  tasks.forEach(function (task) {
-    i += j
-    if (task.split(' ').join('-').toLowerCase() === taskName) {
-      j = 0
+function deleteTask (taskId) {
+  for (let i = 0; i < tasks.length; i++) {
+    if (tasks[i].id === taskId) {
+      tasks.splice(i, 1)
+      break
     }
-  })
-  tasks.splice(i - 1, 1)
+  }
   localStorage.setItem('tasks', JSON.stringify(tasks))
 }
 
-addEventListener('load', function () {
+function displayTask (task) {
+  const li = document.createElement('li')
+  taskContainer.appendChild(li)
+  li.dataset.id = task.id
+  
+  const checkbox = document.createElement('input')
+  li.appendChild(checkbox)
+  checkbox.type = 'checkbox'
+  
+  const span = document.createElement('span')
+  li.appendChild(span)
+  span.innerHTML = task.name
+  
+  checkbox.onchange = function () {
+    deleteTask(parseInt(li.dataset.id))
+    taskContainer.removeChild(li)
+  }
+  
+  //Bootstrap styles
+  li.classList.add('list-group-item')
+  checkbox.classList.add('form-check-input', 'me-2')
+  span.classList.add('form-check-label')
+}
+
+window.onload = function () {
+  loadTasks()
   if (tasks.length !== 0) {
     tasks.forEach(function (task) {
-      renderTask(task)
+      displayTask(task)
     })
   }
-})
-
-const checkboxes = document.querySelectorAll('input.checkbox')
-checkboxes.forEach(function (checkbox) {
-  checkbox.addEventListener('change', function () {
-    removeTask(checkbox.parentNode.classList[0])
-  })
-})
-
-const main = document.getElementById('main')
-main.style.height = innerHeight
-window.addEventListener('resize', function () {
-  main.style.height = innerHeight
-})
-
-const addButton = document.querySelector('#main > button')
-const addTaskPrompt = document.querySelector('.add-task-prompt')
-const addTaskInput = document.querySelector('.add-task-prompt > input')
-const addTaskCancelButton = document.querySelector('.add-task-prompt > .buttons-container > #cancel')
-const addTaskButton = document.querySelector('.add-task-prompt > .buttons-container > #add')
-
-addButton.addEventListener('click', function () {
-  addTaskPrompt.classList.add('active')
-})
-addTaskCancelButton.addEventListener('click', function () {
-  addTaskPrompt.classList.remove('active')
-})
-addTaskButton.addEventListener('click', function () {
-  if (addTaskInput.value === '') {
-    addTaskInput.value = ' '
+  plusButton.onclick = function () {
+    if (taskValue.value === '') {
+      taskValue.value = ' '
+    }
+    addTask(taskValue.value)
+    taskValue.value = ''
   }
-  addTask(addTaskInput.value)
-  addTaskInput.value = ''
-  addTaskPrompt.classList.remove('active')
-})
+}
